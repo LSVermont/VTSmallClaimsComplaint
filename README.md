@@ -1,2 +1,5 @@
-# VTSmallClaimsComplaint
-A docassemble extension. Our official respository for small claims complaint form 100-00257. 
+# docassemble.VTSmallClaimsComplaint
+Small claims complaint - 100-00257
+
+## Author
+Guided interview by Legal Services Vermont / VTLawHelp.org website
