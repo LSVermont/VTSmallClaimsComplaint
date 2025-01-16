@@ -1,0 +1,566 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALToolbox:phone-number-validation.yml
+  - docassemble.VTSharedYMLFile:VTSharedYMLFile.yml
+---
+metadata:
+  title: >-
+    Start a small claims case
+  short title: >-
+    Small claims
+  description: |-
+    This interview helps someone in Vermont start a small claims case.
+  can_I_use_this_form: |
+    If you live in Vermont and are seeking $10,000 or less, you can use this interview to start a small claims case.
+  before_you_start: |
+    This guided interview will produce an initial package of forms needed to start a small claims case in Vermont.
+    
+    Before you get started, please gather:
+    
+    1. 
+    1. 
+    1. 
+    
+    When you are finished, you will need to:
+    
+    1. 
+    1.
+  maturity: production
+  estimated_completion_minutes: 15
+  estimated_completion_delta: 5
+  LIST_topics: 
+    - "MO-10-00-00-00"
+  tags:
+    - "MO-10-00-00-00"
+  authors:
+    - Kelly McGuire
+  original_form:
+    - NA
+  original_form_published_on: ""
+  help_page_url: >-
+    https://vtlawhelp.org/roadmap/small-claims/step-1
+  help_page_title: >-
+    Vermont Law Help page about small claims
+  allowed_courts: []
+  typical_role: "anonymous"
+  al_weaver_version: "1.11.0"
+  generated_on: "2024-12-27"
+  languages:
+    - en
+  jurisdiction: NAM-US-US+VT
+  review_date: 2024-12-27
+  form_titles:
+    - Small Claims
+  form_numbers:
+    - 100-00257
+  update_notes: |
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "VT"
+---
+code: |
+  github_repo_name = 'docassemble-VTSmallClaimsComplaint'
+---
+code: |
+  interview_short_title = "Start a small claims case in Vermont"
+---
+objects:
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+  - attorneys: ALPeopleList.using(ask_number=True,target_number=1)
+  - other_parties: ALPeopleList.using(ask_number=True,target_number=1)
+---
+#objects:
+#  - all_courts: ALCourtLoader.using(file_name='docassemble.VTSharedYMLFile:data/sources/courts_list_full.xlsx')
+---
+#code: |
+#  trial_court_index = all_courts.matching_courts_in_county(county_name=user_selected_county,search_columns=['division_abbr'],search_string=trial_court_division)[0][0]
+---
+sections:
+  - intro: Is this tool right for you?
+  - about_you: About you
+  - other_party: The other party
+  - case_info: Your court case
+  - review_small_claims_answer: Edit your answers
+  - sign: Sign your documents
+  - get_docs: Download your documents
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_small_claims
+code: |
+  
+  user_role = "plaintiff"
+  user_ask_role = "plaintiff"
+  nav.set_section('intro')
+  VT_small_claims_intro
+  important_notes_to_user
+  set_progress(5)
+  money_screening
+  if not money_screening:
+    money_screening_kickout
+  debt_screening
+  if debt_screening:
+    debt_screening_kickout
+  non_money_screening
+  if non_money_screening:
+    non_money_screening_kickout
+  fee_screening
+  if not fee_screening:
+    fee_screening_kickout
+  set_progress(16)
+  nav.set_section('about_you')
+  users.gather()
+  users[0].birthdate
+  users[0].address.address
+  users[0].daytime_phone_number
+  users[0].email
+  set_progress(32)
+  user_has_attorney
+  if user_has_attorney:
+    attorneys.gather()
+    attorneys[0].address.address
+  nav.set_section('other_party')
+  other_parties.there_are_any = True
+  other_parties.gather()
+  other_parties[0].birthdate
+  other_parties[0].address.address
+  set_progress(48)
+  nav.set_section('case_info')
+
+  claim_principal
+  claim_interest
+  claim_court_costs
+  claim_amount_total
+  set_progress(64)
+  complaint_description
+  nav.set_section("review_small_claims_complaint")
+  
+  interview_order_small_claims_complaint = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  interview_order_small_claims_complaint
+  nav.set_section("review_small_claims_complaint")
+  
+  nav.set_section("sign")
+  set_progress(95)
+  signature_date
+  al_form_requires_digital_signature = False
+  basic_questions_signature_flow
+  
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+    persistent=True,
+    data={
+        "zip": showifdef("users[0].address.zip"),
+        "reached_interview_end": True,
+    },
+  )
+  nav.set_section("get_docs")
+  VT_small_claims_complaint_download
+  
+---
+############################### INTRO SCREENS ###############################
+---
+id: basic questions intro screen
+decoration: form-lineal
+question: |
+  ${interview_short_title}
+subquestion: |  
+
+  <p>${ intro_vtcourtforms_3_steps }</p>
+  
+  <i class="fas fa-file-text fa-2x"></i> This tool will produce a completed Small Claims Complaint for Vermont courts — form 100-00257.
+  
+    <i class="fas fa-clock fa-2x"></i>  It may take you between 10 and 20 minutes to complete this. If you want, you can create an account and save your work to return to later.
+
+  <i class="fas fa-circle-info fa-2x"></i> It is free to use this tool. This site is not a lawyer.
+  
+  Visit the [VTLawHelp.org website](https://vtlawhelp.org) for information about civil legal issues.
+
+  <p>${ intro_vtcourtforms_created_by }</p>
+
+continue button field: al_intro_screen
+  Most people take about 15 minutes to complete this interview.
+---
+id: VT small claims intro
+continue button field: VT_small_claims_intro
+question: |
+  Is this tool right for you?
+subquestion: | 
+
+  <p>Ask for general help with court forms or the court process by contacting the <a href="https://www.vermontjudiciary.org/self-help/ARC">Vermont Judiciary Access and Resource Center.</a> Their services are free and they serve the whole state. They do NOT give legal advice.</p>
+
+  <h4>Our terms of use</h4>
+fields:
+  - To continue, please accept our [terms of use](https://vtlawhelp.org/vtcourtforms/terms-of-use).: acknowledged_information_use
+    datatype: checkboxes
+    none of the above: False    
+    minlength: 1
+    choices:
+      - I accept the terms of use.
+    validation messages:
+      minlength: |
+        You cannot continue unless you agree to the terms of use.
+---
+id: important_notes_to_user
+question: |
+  Important
+subquestion: |  
+  <i class="fa fa-exclamation-circle fa-2x"></i>  This tool does **not** file your small claims complaint form with the court. You will need to get it to the court yourself such as by email, mail or in person. We will give you instructions when you finish the form.
+    
+    Let's get started. Tap the Next button.
+continue button field: important_notes_to_user
+---
+id: initial screening
+question: |
+  Do you want to sue a person, business or organization for $10,000 or less?
+fields:
+  - no label: money_screening
+    datatype: yesnoradio
+---
+id: initial screening kickout
+question: |
+  You cannot sue someone for more than $10,000 in small claims court.
+subquestion: |
+  If you wanted to sue someone for more than $10,000, but will settle for $10,000, you can use small claims court to get the $10,000. Some people do this because small claims court is easier and cheaper than going to the Civil Division of Vermont Superior Court.
+
+  Do you want to continue starting a case for $10,000 or less?
+continue button field: money_screening_kickout
+buttons:
+  - DELETE your answers: restart
+  - CONTINUE to interview: continue
+---
+id: debt screening
+question: |
+  Is your case about a credit card transaction or about medical debt?
+fields:
+  - no label: debt_screening
+    datatype: yesnoradio
+---
+id: debt screening kickout
+question: |
+  In Vermont, for a consumer credit transaction or medical debt, the maximum amount you can ask for in a small claims case is $5,000.
+subquestion: |
+  You may use this tool if you are asking for $5,000 or less. Do you want to continue?
+continue button field: debt_screening_kickout
+buttons:
+  - DELETE your answers: restart
+  - CONTINUE to interview: continue
+---
+id: non money screening
+question: |
+  Do you want something other than money?
+subquestion: |
+  For example, getting the court to order someone to **do** something or **stop doing** something?
+fields:
+  - no label: non_money_screening
+    datatype: yesnoradio
+---
+id: non money screening kickout
+question: |
+  Small claims court cannot help if you are asking the court to order someone to do something or stop doing something. That kind of order is called an “injunction.” You cannot use small claims court for an injunction.
+continue button field: non_money_screening_kickout
+buttons:
+  - DELETE your answers: restart
+  - CONTINUE to interview: continue
+---
+id: fee screening
+question: |
+  Are you aware of the court filing fee? Or do you plan to fill out a form to ask for a fee waiver?
+fields:
+  - no label: fee_screening
+    datatype: yesnoradio
+---
+id: fee screening kickout
+question: |
+  There is a filing fee for small claims court. In 2024 it was $65 for claims for $1,000 or less, or $90 for claims more than $1,000. You can pay the court with cash, check or money order.
+subquestion: |
+  Do you want to continue?
+continue button field: fee_screening_kickout
+buttons:
+  - DELETE your answers: restart
+  - CONTINUE to interview: continue
+---
+############################### USER INFO ###############################
+---
+id: Phone and email
+question: |
+  What is the best phone number and email to reach you at?
+fields:
+  - "Your daytime phone number": users[0].daytime_phone_number
+    maxlength: 27
+  - "Your email address": users[0].email
+    maxlength: 38
+---
+id: users lawyer
+question: |
+  Do you have a lawyer?
+fields:
+  - "Do you have an attorney working with you on this case?": user_has_attorney
+    datatype: yesnoradio
+  - note: |
+      Usually, the people who use this guided interview do **not** have a lawyer. If you are represented by a lawyer, the lawyer usually files court paperwork for you. Ask them about this.
+---
+############################### DEFENDANT INFO ###############################
+---
+id: names of opposing parties
+sets:
+  - other_parties[i].name.first
+  - other_parties[i].name.last
+  - other_parties[i].name.middle
+  - other_parties[i].name.suffix
+question: |
+  Name of ${ ordinal(i) } defendant
+subquestion: |
+  A defendant is the person who is being sued and is responding to a court action.
+fields:
+  - code: |
+      other_parties[i].name_fields(person_or_business='unsure')
+---
+############################### CASE INFO ###############################
+---
+id: choose a court county
+question: |
+  What county is your case in?
+fields:
+  - note: |
+      Choose the county where you will file this form.
+
+  - County: user_selected_county
+    code: sorted(all_courts.unique_column_values('branch') - {"Environmental", "Judicial Bureau"} )
+  
+  - note: |
+      ${ collapse_template(which_county_to_choose) }
+      ${ collapse_template(in_which_county) }
+---
+id: claim principal
+question: |
+  How much are you suing for?
+fields:
+  - "How much are you suing for?": claim_principal
+    datatype: currency
+    min: 0
+---
+id: claim interest
+question: |
+  How much interest do you want to claim on the amount you are suing for?
+fields:
+  - "How much interest do you believe is owed on the amount you are suing for?": claim_interest
+    datatype: currency
+    min: 0
+---
+id: claim court costs
+question: |
+  What are your court costs for filing this case?
+subquestion: |
+  * If your claim is $1,000 or less the fee will be $65.00.
+  * If your claim is more than $1,000 the fee will be $90.00.
+field: claim_court_costs
+datatype: currency
+choices:
+  - 65
+  - 90
+---
+code: |
+  claim_amount_total = claim_principal + claim_interest + claim_court_costs
+---
+id: complaint description
+question: |
+  Please describe what happened.
+fields:
+  - "In your own words, describe what happened.": complaint_description
+    input type: area
+---
+##################### REVIEW SCREEN #######################
+---
+id: small claims review screen
+event: review_small_claims
+question: |
+  Review your answers
+review:
+  - Edit: users[0]
+    button: |
+      **What is your name?**:
+      ${ users[0] }
+  - Edit: other_parties[i]
+    button: |
+      **What is the defendant's name?**:
+      ${ other_parties[i] }
+  - Edit: users[0].address
+    button: |
+      **What is your address?**:
+      ${ users[0].address }
+  - Edit: other_parties[i].address
+    button: |
+      **What is the defendant's address?**:
+      ${ other_parties[i].address }
+  - Edit: users[0].email
+    button: |
+      **What is your email?**:
+      ${ users[0].email }
+  - Edit: users[0].daytime_phone_number
+    button: |
+      **What is your phone number?**:
+      ${ users[0].daytime_phone_number }
+  - Edit: claim_principal
+    button: |
+      **How much are you suing for?**:
+      ${ currency(claim_principal) }
+  - Edit: claim_interest
+    button: |
+      **How much interest do you believe is owed on the amount you are suing for?**:
+      ${ currency(claim_interest) }
+  - Edit: claim_court_costs
+    button: |
+      **How much will your court costs be for filing this small claims case?**:
+      ${ currency(claim_court_costs) }
+  - Edit: complaint_description
+    button: |
+      **In your own words, describe what happened.**:
+      > ${ single_paragraph(complaint_description) }
+---
+##################### DOWNLOAD SCREEN #####################
+---
+id: download screen
+event: VT_small_claims_complaint_download
+question: |
+  ${download_screen_instructions_headline}
+subquestion: |
+  ${download_screen_instructions}
+
+  <hr>
+  
+  <h4 style="margin-bottom: 18px;">Documents to download</h4>
+  
+  ${ al_user_bundle.download_list_html() }
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=False) }
+
+  <hr>  
+  
+  ${ download_screen_bottom_instructions }
+  
+  ${ collapse_template(not_seeing_email) }
+  ${ collapse_template(log_out_when_done) }
+
+progress: 100
+---
+##################### DEFAULTS FOR DRAFT PDF VARIABLES #####################
+code: |
+  default_judgement_date = "DRAFT"
+  financial_disclosure_order_date = "DRAFT"
+  motion_for_default_judgement_date = "DRAFT"
+  notice_of_appeal_date = "DRAFT"
+  other_description = "DRAFT"
+---
+##################### ATTACHMENTS #####################
+---
+objects:
+  - VT_small_claims_complaint_attachment: ALDocument.using(title="Vermont small claims complaint form 100-00257", filename="small_claims_complaint_with_info_100_00257.pdf", enabled=True, has_addendum=False)
+  - VT_small_claims_certificate_of_service_attachment: ALDocument.using(title="Vermont small claims certificate of service form 100-00260", filename="small_claims_certificate_of_service_100_00260.pdf", enabled=True, has_addendum=False)
+  - VT_small_claims_information_and_instructions_for_defendant_attachment: ALDocument.using(title="Vermont small claims information and instructions for defendant form 100-00259", filename="100-00259._Small_Claims_Information_and_Instructions_for_Defendant.pdf", has_addendum=False)
+  - VT_small_claims_disclosure_of_exempt_income_attachment: ALDocument.using(title="Vermont small claims disclosure of exempt income form 100-00128", filename="100-00128._Disclosure_of_Exempt_Income.pdf", has_addendum=False)
+  - VT_small_claims_answer_attachment: ALDocument.using(title="Vermont small claims answer form 100-00126", filename="100-00126._Small_Claims_Answer.pdf", has_addendum=False)
+---
+code: |
+  VT_small_claims_information_and_instructions_for_defendant_attachment.enabled = True
+  VT_small_claims_disclosure_of_exempt_income_attachment.enabled = True
+  VT_small_claims_answer_attachment.enabled = True
+---
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[
+      VT_small_claims_complaint_attachment, 
+      VT_small_claims_certificate_of_service_attachment, 
+      VT_small_claims_information_and_instructions_for_defendant_attachment, 
+      VT_small_claims_disclosure_of_exempt_income_attachment, 
+      VT_small_claims_answer_attachment], 
+      filename="VT_small_claims", title="Download all forms", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[
+      VT_small_claims_complaint_attachment], 
+      filename="VT_small_claims", title="All forms to deliver to court", enabled=True)
+---
+attachments:
+  - name: VT small claims complaint attachment
+    filename: small_claims_complaint_with_info_100_00257.pdf
+    variable name: VT_small_claims_complaint_attachment[i]        
+    skip undefined: True
+    pdf template file: small_claims_complaint_with_info_100_00257.pdf
+    fields:
+      - "trial_court_county": ""
+      - "users1_name": ${ users[0] }
+      - "users1_name_full": ${ users[0] }
+      - "users1_address_line_one": ${ users[0].address.line_one() }
+      - "users1_address_line_two": ${ users[0].address.line_two() }
+      - "users1_birthdate": ${ format_date(users[0].birthdate, format='M/d/yyyy') }
+      - "users1_daytime_phone_number": ${ phone_number_formatted(users[0].daytime_phone_number) }
+      - "users1_email": ${ users[0].email }
+      - "users1_attorneys_name": ${ attorneys[0] }
+      - "users1_attorneys_address_line_one": ${ attorneys[0].address.line_one() }
+      - "users1_attorneys_address_line_two": ${ attorneys[0].address.line_two() }
+      - "other_parties1_name": ${ other_parties.short_list(2) }
+      - "other_parties1_name1": ${ other_parties.short_list(2) }
+      - "other_parties1_address_line_one": ${ other_parties[0].address.line_one() }
+      - "other_parties1_address_line_two": ${ other_parties[0].address.line_two() }
+      - "other_parties1_birthdate": ${ format_date(other_parties[0].birthdate, format='M/d/yyyy') }
+      - "claim_amount_principal": ${ claim_principal }
+      - "claim_amount_interest": ${ claim_interest }
+      - "claim_amount_court_costs": ${ claim_court_costs }
+      - "claim_amount_total": ${ claim_amount_total }
+      - "complaint_description": ${ complaint_description }
+      - "signature_date": ${ signature_date }
+      - "users1_name_1": ${ printed_signature }
+      - "users1_signature": |
+          if user_has_attorney:
+            ${ attorneys[0].signature }
+          else:
+            ${ users[0].signature }
+        
+  - name: VT small claims certificate of service attachment
+    filename: small_claims_certificate_of_service_100_00260.pdf    
+    variable name: VT_small_claims_certificate_of_service_attachment[i]        
+    skip undefined: True
+    pdf template file: small_claims_certificate_of_service_100_00260.pdf
+    fields:
+      - "trial_court_county": ""
+      - "users1_name": ${ users[0] }
+      - "users1_name_full": ${ users[0] }
+      - "users1_name_1": ${ users[0] }
+      - "users1_address_mailing_line_one": ${ users[0].address.line_one() }
+      - "users1_address_mailing_line_two": ${ users[0].address.line_two() }
+      - "users1_daytime_phone_number": ${ phone_number_formatted(users[0].daytime_phone_number) }
+      - "users1_email": ${ users[0].email }
+      - "other_parties1_name": ${ other_parties.short_list(2) }
+      - "motion_for_default_judgement_date": ${ motion_for_default_judgement_date }
+      - "default_judgement_date": ${ default_judgement_date }
+      - "financial_disclosure_order_date": ${ financial_disclosure_order_date }
+      - "notice_of_appeal_date": ${ notice_of_appeal_date }
+      - "other_description": ${ other_description }
+---
+attachment:
+  variable name: VT_small_claims_information_and_instructions_for_defendant_attachment[i]
+  pdf template file: 100-00259._Small_Claims_Information_and_Instructions_for_Defendant.pdf
+  tagged pdf: True
+---
+attachment:
+  variable name: VT_small_claims_disclosure_of_exempt_income_attachment[i]
+  pdf template file: 100-00128._Disclosure_of_Exempt_Income.pdf
+  tagged pdf: True
+---
+attachment:
+  variable name: VT_small_claims_answer_attachment[i]
+  pdf template file: 100-00126._Small_Claims_Answer.pdf
+  tagged pdf: True
+---
