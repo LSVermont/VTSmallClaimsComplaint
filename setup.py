@@ -1,6 +1,6 @@
 import os
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from fnmatch import fnmatchcase
 from distutils.util import convert_path
 
@@ -43,18 +43,18 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
                 out.setdefault(package, []).append(prefix+name)
     return out
 
-setup(name='docassemble.VTDivorce',
-      version='1.3.2',
-      description=('Fill out initial forms to get a divorce, separation or civil union dissolution in Vermont'),
-      long_description='# docassemble.VTDivorce\r\n\r\nDivorce\r\n\r\n## Authors\r\n\r\n- K. Surette, Legal Services Vermont\r\n- Q. Steenhuis, M. Bonardi and S. Constantinou, Lemma Legal\r\n\r\n\r\n',
+setup(name='docassemble.VTSmallClaimsComplaint',
+      version='0.1',
+      description=('Small claims complaint - Vermont - Form 100-00257'),
+      long_description='# docassemble.VTSmallClaimsComplaint\n\nSmall claims complaint - Vermont - Form 100-00257\n\n## Author\n\nkelizamcguire@gmail.com\n\n',
       long_description_content_type='text/markdown',
-      author='K. Surette',
-      author_email='ksurette@legalservicesvt.org',
+      author='Guided interview by Legal Services Vermont / VTCourtForms',
+      author_email='kelizamcguire@gmail.com',
       license='The MIT License',
-      url='legalservicesvt.org',
-      packages=find_packages(),
-      namespace_packages=['docassemble'],
-      install_requires=['docassemble.ALToolbox>=0.11.1', 'docassemble.AssemblyLine>=3.1.0', 'docassemble.VTSharedYMLFile', 'docassemble.demo>=1.4.112'],
+      url='https://VTLawHelp.org/VTCourtForms',
+      packages=find_namespace_packages(),
+      install_requires=['docassemble.ALToolbox>=0.11.1', 'docassemble.AssemblyLine>=3.2.0', 'docassemble.GithubFeedbackForm>=0.4.1.1', 'docassemble.VTFeedback', 'docassemble.VTSharedYMLFile'],
       zip_safe=False,
-      package_data=find_package_data(where='docassemble/VTDivorce/', package='docassemble.VTDivorce'),
+      package_data=find_package_data(where='docassemble/VTSmallClaimsComplaint/', package='docassemble.VTSmallClaimsComplaint'),
      )
+
