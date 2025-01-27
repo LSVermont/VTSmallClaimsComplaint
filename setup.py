@@ -46,7 +46,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
 setup(name='docassemble.VTSmallClaimsComplaint',
       version='0.1',
       description=('Small claims complaint - Vermont - Form 100-00257'),
-      long_description='# docassemble.VTSmallClaimsComplaint\n\nSmall claims complaint - Vermont - Form 100-00257\n\n## Author\n\nkelizamcguire@gmail.com\n\n',
+      long_description='# docassemble.VTSmallClaimsComplaint\r\nSmall claims complaint - 100-00257\r\n\r\n## Author\r\nGuided interview by Legal Services Vermont / VTLawHelp.org website\r\n',
       long_description_content_type='text/markdown',
       author='Guided interview by Legal Services Vermont / VTCourtForms',
       author_email='kelizamcguire@gmail.com',
