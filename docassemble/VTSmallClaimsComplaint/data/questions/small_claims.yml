@@ -75,11 +75,11 @@ objects:
   - attorneys: ALPeopleList.using(ask_number=True,target_number=1)
   - other_parties: ALPeopleList.using(ask_number=True,target_number=1)
 ---
-#objects:
-#  - all_courts: ALCourtLoader.using(file_name='docassemble.VTSharedYMLFile:data/sources/courts_list_full.xlsx')
+objects:
+  - all_courts: ALCourtLoader.using(file_name='docassemble.VTSharedYMLFile:data/sources/courts_list_full.xlsx')
 ---
-#code: |
-#  trial_court_index = all_courts.matching_courts_in_county(county_name=user_selected_county,search_columns=['division_abbr'],search_string=trial_court_division)[0][0]
+code: |
+  trial_court_index = all_courts.matching_courts_in_county(county_name=user_selected_county,search_columns=['division_abbr'],search_string=trial_court_division)[0][0]
 ---
 sections:
   - intro: Is this tool right for you?
@@ -134,6 +134,7 @@ code: |
   set_progress(48)
   nav.set_section('case_info')
 
+  user_selected_county
   claim_principal
   claim_interest
   claim_court_costs
@@ -340,7 +341,7 @@ fields:
       Choose the county where you will file this form.
 
   - County: user_selected_county
-    code: sorted(all_courts.unique_column_values('branch') - {"Environmental", "Judicial Bureau"} )
+    code: sorted(all_courts.unique_column_values('branch') - {"Environmental", "Judicial Bureau", "Criminal", "Family"} )
   
   - note: |
       ${ collapse_template(which_county_to_choose) }
@@ -499,7 +500,7 @@ attachments:
     skip undefined: True
     pdf template file: small_claims_complaint_with_info_100_00257.pdf
     fields:
-      - "trial_court_county": ""
+      - "trial_court_county": ${ user_selected_county }
       - "users1_name": ${ users[0] }
       - "users1_name_full": ${ users[0] }
       - "users1_address_line_one": ${ users[0].address.line_one() }
